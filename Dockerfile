@@ -54,17 +54,22 @@ RUN git clone https://github.com/zackangelo/ammonium.git && \
 		git reset --hard fbba2d9e819304f0917195f29db9bcca33712cf0 && \
 		sbt -Dsbt.version=$SBT_VERSION publishLocal < /dev/null
 
-RUN curl -fsL http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-preview.tgz | tar xfz - -C /root/ && \ 
-		cd /root/spark-2.0.0-preview \ 
-		sbt -Dsbt.version=$SBT_VERSION package 
-
+RUN curl http://d3kbcqa49mib13.cloudfront.net/spark-2.0.0-preview-bin-hadoop2.7.tgz | tar xfz - -C /root/ 
+		
 COPY SparkTest.ipynb /root/SparkTest.ipynb
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+RUN mkdir -p /root/titanic
+
+COPY titanic/ /root/titanic
+
 ENV PATH /opt/conda/bin:$PATH
 
 ENV LANG C.UTF-8
+
+ENV SPARK_MASTER_IP 0.0.0.0
+ENV SPARK_MASTER_PORT 7077
 
 # Define working directory
 WORKDIR /root
